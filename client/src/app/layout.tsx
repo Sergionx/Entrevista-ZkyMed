@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 
+import { BackgroundGradientAnimation } from "@/lib/components/ui/background-gradient-animation";
+import {NextUIProvider} from '@nextui-org/react'
+
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -16,7 +19,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={inter.className}>{children}</body>
+      <body className={inter.className}>
+      <NextUIProvider>
+
+        <BackgroundGradientAnimation>
+          {children}
+          </BackgroundGradientAnimation>
+      </NextUIProvider>
+      </body>
     </html>
   );
 }
