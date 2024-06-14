@@ -1,10 +1,10 @@
 "use client";
 import { Deck } from "@/lib/models/Deck";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import CardStack from "./card-stack";
 import { IconArrowLeft, IconArrowRight, IconPlus } from "@tabler/icons-react";
 import FlipCard from "./FlipCard/FlipCard";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Tooltip } from "@nextui-org/tooltip";
 import { Button } from "@nextui-org/button";
 import CreateCardModal from "../modals/create-card-modal";
@@ -17,6 +17,7 @@ interface Props {
 
 export default function DeckSlider({ decks }: Props) {
   const [currentDeckIndex, setCurrentDeckIndex] = useState(0);
+  const [animationDirection, setAnimationDirection] = useState(1); // 1 for next, -1 for prev
 
   const [deckToCreateCard, setDeckToCreateCard] = useState<Deck | null>(null);
   const {
@@ -25,11 +26,31 @@ export default function DeckSlider({ decks }: Props) {
     onOpenChange: onCreateDeckOpenChange,
   } = useDisclosure();
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "ArrowLeft") {
+        handlePrev();
+      } else if (event.key === "ArrowRight") {
+        handleNext();
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, []);
+
   const handleNext = () => {
+    setAnimationDirection(1);
+
     setCurrentDeckIndex((prevIndex) => (prevIndex + 1) % decks.length);
   };
 
   const handlePrev = () => {
+    setAnimationDirection(-1);
+
     setCurrentDeckIndex(
       (prevIndex) => (prevIndex - 1 + decks.length) % decks.length
     );
@@ -49,10 +70,13 @@ export default function DeckSlider({ decks }: Props) {
           </Button>
         </Tooltip>
 
-        <DeckSection
-          deck={decks[currentDeckIndex]}
-          setDeckToCreateCard={setDeckToCreateCard}
-        />
+        <AnimatePresence>
+          <DeckSection
+            deck={decks[currentDeckIndex]}
+            setDeckToCreateCard={setDeckToCreateCard}
+            direction={animationDirection}
+          />
+        </AnimatePresence>
 
         <Tooltip content="Next deck" color="foreground">
           <Button
@@ -119,12 +143,27 @@ export default function DeckSlider({ decks }: Props) {
 function DeckSection({
   deck,
   setDeckToCreateCard,
+  direction,
 }: {
   deck: Deck;
   setDeckToCreateCard: (deck: Deck) => void;
+  direction: number;
 }) {
+  const movement = 300 * direction;
+
   return (
-    <motion.section key={deck.id} className="z-10 max-w-sm px-2">
+    <motion.section
+      key={deck.id}
+      className="z-10 max-w-sm px-2"
+      initial={{ x: movement, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      exit={{ x: -movement, opacity: 0 }}
+      transition={{
+        duration: 0.5,
+
+        ease: "easeOut",
+      }}
+    >
       <h2 className="text-white mb-4 text-center balanc">{deck.title}</h2>
 
       <CardStack
@@ -143,7 +182,7 @@ function DeckSection({
               back={{
                 containerClassName:
                   "bg-gradient-to-t to-orange-300 from-blue-400",
-                children: <p className="text-slate-200">{card.answer}</p>,
+                children: <p className="text-slate-200 ">{card.answer}</p>,
               }}
             />
           ),
