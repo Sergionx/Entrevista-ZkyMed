@@ -152,54 +152,58 @@ function DeckSection({
   const movement = 300 * direction;
 
   return (
-    <motion.section
-      key={deck.id}
-      className="z-10 max-w-sm px-2"
-      initial={{ x: movement, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -movement, opacity: 0 }}
-      transition={{
-        duration: 0.5,
+    <div className="flex flex-col z-10">
+      <h2 className="text-white mb-4 text-center balance text-3xl">
+        {deck.title}
+      </h2>
+      
+      <motion.section
+        key={deck.id}
+        className="max-w-sm px-2"
+        initial={{ x: movement, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        exit={{ x: -movement, opacity: 0 }}
+        transition={{
+          duration: 0.5,
 
-        ease: "easeOut",
-      }}
-    >
-      <h2 className="text-white mb-4 text-center balanc">{deck.title}</h2>
-
-      <CardStack
-        initialCards={deck.cards.map((card, index) => ({
-          id: index,
-          content: (
-            <FlipCard
-              key={deck.id}
-              front={{
-                containerClassName:
-                  "bg-gradient-to-t from-orange-300 to-blue-400",
-                children: (
-                  <h1 className="text-2xl font-bold">{card.question}</h1>
-                ),
-              }}
-              back={{
-                containerClassName:
-                  "bg-gradient-to-t to-orange-300 from-blue-400",
-                children: <p className="text-slate-200 ">{card.answer}</p>,
-              }}
-            />
-          ),
-        }))}
-      />
-
-      <p className="text-slate-300 mt-4 ">{deck.description}</p>
-
-      <Button
-        className="mt-2"
-        color="secondary"
-        variant="shadow"
-        startContent={<IconPlus />}
-        onClick={() => setDeckToCreateCard(deck)}
+          ease: "easeOut",
+        }}
       >
-        Create flashcard
-      </Button>
-    </motion.section>
+        <CardStack
+          initialCards={deck.cards.map((card, index) => ({
+            id: index,
+            content: (
+              <FlipCard
+                key={deck.id}
+                front={{
+                  containerClassName:
+                    "bg-gradient-to-t from-orange-300 to-blue-400",
+                  children: (
+                    <h1 className="text-2xl font-bold">{card.question}</h1>
+                  ),
+                }}
+                back={{
+                  containerClassName:
+                    "bg-gradient-to-t to-orange-300 from-blue-400",
+                  children: <p className="text-slate-200 ">{card.answer}</p>,
+                }}
+              />
+            ),
+          }))}
+        />
+
+        <p className="text-slate-300 mt-4 ">{deck.description}</p>
+
+        <Button
+          className="mt-2"
+          color="secondary"
+          variant="shadow"
+          startContent={<IconPlus />}
+          onClick={() => setDeckToCreateCard(deck)}
+        >
+          Create flashcard
+        </Button>
+      </motion.section>
+    </div>
   );
 }
