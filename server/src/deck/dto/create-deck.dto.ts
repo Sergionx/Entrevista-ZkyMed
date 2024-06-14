@@ -1,4 +1,12 @@
-import { MaxLength, MinLength } from 'class-validator';
+import {
+  ArrayMinSize,
+  IsArray,
+  MaxLength,
+  MinLength,
+  ValidateNested,
+} from 'class-validator';
+import { Type } from 'class-transformer';
+import { CreateCardDto } from './create-card.dto';
 
 export class CreateDeckDto {
   @MinLength(3, {
@@ -16,4 +24,10 @@ export class CreateDeckDto {
     message: 'Title must have at most 255 characters',
   })
   description: string;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  @ValidateNested({ each: true })
+  @Type(() => CreateCardDto)
+  cards: [];
 }
